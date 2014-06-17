@@ -1,6 +1,6 @@
 var request = (function ( f ){
-  return f()
-}(function (){
+  return f(EventStation)
+}(function ( ES ){
   var methods = [
     'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol',
     'move', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout',
@@ -197,6 +197,7 @@ var request = (function ( f ){
   }
 
   Request.prototype = {}
+  ES.mixin(Request.prototype)
 
   /**
    * Set `Authorization` header field.
