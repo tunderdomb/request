@@ -78,8 +78,8 @@
   return EventStation
 }));
 var request = (function ( f ){
-  return f()
-}(function (){
+  return f(EventStation)
+}(function ( ES ){
   var methods = [
     'get', 'post', 'put', 'head', 'delete', 'options', 'trace', 'copy', 'lock', 'mkcol',
     'move', 'propfind', 'proppatch', 'unlock', 'report', 'mkactivity', 'checkout',
@@ -120,21 +120,32 @@ var request = (function ( f ){
     return err
   }
 
-  function createHTTP(){
+  function createHTTP( cors ){
     var root = window || this
-    if ( root.XMLHttpRequest && (root.location.protocol != 'file:' || !root.ActiveXObject) ) {
-      return new XMLHttpRequest
+    var http = null
+    if ( root.XMLHttpRequest && (root.location.protocol != "file:" || !root.ActiveXObject) ) {
+      http = new XMLHttpRequest
+      if ( cors && !("withCredentials" in http) ) {
+        http = null
+      }
     } else {
-      try { return new ActiveXObject('Microsoft.XMLHTTP') }
-      catch ( e ) {}
-      try { return new ActiveXObject('Msxml2.XMLHTTP.6.0') }
-      catch ( e ) {}
-      try { return new ActiveXObject('Msxml2.XMLHTTP.3.0') }
-      catch ( e ) {}
-      try { return new ActiveXObject('Msxml2.XMLHTTP') }
-      catch ( e ) {}
+      if ( cors ) {
+        if ( typeof root.XDomainRequest != "undefined" ) {
+          http = new root.XDomainRequest()
+        }
+      }
+      else {
+        try { return new ActiveXObject("Microsoft.XMLHTTP") }
+        catch ( e ) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0") }
+        catch ( e ) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0") }
+        catch ( e ) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP") }
+        catch ( e ) {}
+      }
     }
-    return null
+    return http
   }
 
   function noop(){}
@@ -148,8 +159,8 @@ var request = (function ( f ){
 
   function parseData( data ){
     var ret = {}
-    data.split('&').forEach(function ( pair ){
-      var parts = pair.split('=')
+    data.split("&").forEach(function ( pair ){
+      var parts = pair.split("=")
       ret[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1])
     })
     return ret
@@ -200,7 +211,7 @@ var request = (function ( f ){
     return data
   }
   RequestOptions.prototype.prepare = function (){
-    var http = createHTTP()
+    var http = createHTTP(this.cors)
     var query = serializeData(this.query)
     var method = this.method
     var url = this.url
@@ -239,7 +250,7 @@ var request = (function ( f ){
   }
   RequestOptions.prototype.addData = function ( name, value ){
     this.data = this.data || {}
-    if ( value == undefined ) {
+    if ( value != undefined ) {
       this.headers[name] = value
     }
     else if ( typeof name != "string" ) extend(this.data, name)
@@ -248,13 +259,13 @@ var request = (function ( f ){
     return this.headers[name]
   }
   RequestOptions.prototype.setHeader = function ( key, value ){
-    if ( value == undefined ) {
+    if ( value != undefined ) {
       this.headers[key] = value
     }
     else if ( typeof key != "string" ) extend(this.headers, key)
   }
   RequestOptions.prototype.addQuery = function ( key, value ){
-    if ( value == undefined ) {
+    if ( value != undefined ) {
       this.query[key] = value
     }
     else if ( typeof key != "string" ) extend(this.headers, key)
@@ -276,6 +287,7 @@ var request = (function ( f ){
   }
 
   Request.prototype = {}
+  ES.mixin(Request.prototype)
 
   /**
    * Set `Authorization` header field.
@@ -285,7 +297,7 @@ var request = (function ( f ){
    * @return {Request}
    * */
   Request.prototype.auth = function ( user, pass ){
-    this.header("Authorization", "Basic" + btoa(user + ':' + pass))
+    this.header("Authorization", "Basic" + btoa(user + ":" + pass))
     return this
   }
 
@@ -342,17 +354,6 @@ var request = (function ( f ){
    * */
   Request.prototype.accept = function ( accept ){
     this.header("Accept", accept)
-    return this
-  }
-
-  /**
-   * Set `Origin` header
-   *
-   * @param origin {String}
-   * @return {Request}
-   * */
-  Request.prototype.origin = function ( origin ){
-    this.header("Origin", origin)
     return this
   }
 
@@ -424,6 +425,20 @@ var request = (function ( f ){
   }
 
   /**
+   * Enable Cross Origin requests.
+   * If an explicit attempt is made for a cross origin request,
+   * but such a thing is not supported by your browser,
+   * the request fails before opening a connection.
+   * In this case an error with a type of `cors` will be passed to the end callback.
+   *
+   * @return {Request}
+   * */
+  Request.prototype.cors = function (){
+    this.options.cors = true
+    return this
+  }
+
+  /**
    * Kicks off the communication.
    *
    * @param [callback]{Function}
@@ -437,6 +452,11 @@ var request = (function ( f ){
     var timeoutId
     var timeout = this.timeoutTime
     this.http = http
+
+    if ( this.options.cors && !http ) {
+      callback(createError("cors", "Cross Origin requests are not supported"))
+      return this
+    }
 
     http.onreadystatechange = function (){
       if ( http.readyState != 4 ) return
@@ -480,6 +500,7 @@ var request = (function ( f ){
 
   function setStatus( res, req ){
     var http = req.http
+    var status = http.status
     var type = status / 100 | 0
 
     res.status = http.status
@@ -511,12 +532,12 @@ var request = (function ( f ){
 
     lines.pop() // trailing CRLF
     lines.forEach(function ( line ){
-      var i = line.indexOf(':')
+      var i = line.indexOf(":")
         , field = line.slice(0, i).toLowerCase()
       fields[field] = line.slice(i + 1).trim()
     })
 
-    fields["Content-Type"] = req.http.getResponseHeader("content-type")
+    fields["content-type"] = req.http.getResponseHeader("content-type")
     return fields
   }
 
@@ -531,11 +552,40 @@ var request = (function ( f ){
     }
   }
 
+  function parseValue( val ){
+    var low = val.toLowerCase()
+      , int = parseInt(val)
+      , float = parseFloat(val)
+    switch ( true ) {
+      case low == "true":
+        return true
+      case low == "false":
+        return false
+      case low == "null":
+        return null
+      case !isNaN(float):
+        return float
+      case !isNaN(int):
+        return int
+      default :
+        return val
+    }
+  }
   function Response( req ){
+    var resp = this
     var http = req.http
     this.text = http.responseText
     setStatus(this, req)
     this.headers = parseHeaders(req)
+    this.header("Content-Type").split(/\s*;\s*/).forEach(function ( str ){
+      var p = str.split(/\s*=\s*/)
+      if ( p[1] ) {
+        resp[p[0]] = p[1]
+      }
+      else {
+        resp.contentType = p[0]
+      }
+    })
     this.body = req.method != "HEAD"
       ? parseBody(this.headers["Content-Type"], http.responseText)
       : null
@@ -544,7 +594,24 @@ var request = (function ( f ){
   Response.prototype = {
     body: null,
     header: function ( field ){
-      return this.headers[field]
+      return this.headers[field.toLowerCase()]
+    },
+    headerParams: function ( field ){
+      var header = this.header(field)
+      if ( !header ) return null
+      var params = {}
+      header.split(/\s*[;,]\s*/).forEach(function ( str ){
+        var p = str.split(/\s*=\s*/)
+          , key = p[0]
+          , val = p[1]
+        if ( val ) {
+          params[key] = parseValue(val)
+        }
+        else {
+          params[key] = true
+        }
+      })
+      return params
     }
   }
 

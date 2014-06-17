@@ -1,0 +1,18 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>hello</title>
+</head>
+<body>
+
+<script type="text/javascript" src="../dist/request.js"></script>
+<script type="text/javascript">
+  request
+    .get("http://updates.html5rocks.com")
+    .cors()
+    .end(function( err, resp ){
+      console.log(resp.body.match('<title>(.*)?</title>')[1], resp)
+    })
+</script>
+</body>
+</html>

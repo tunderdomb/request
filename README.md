@@ -7,7 +7,7 @@ Inspired by [superagent](https://github.com/visionmedia/superagent).
 ## Why another ajax library?
 
 I tell you why. There's no unopinionated library out there.
-Either you have to pull un a whole all-in-one library just so you can call x endpoint,
+Either you have to pull in a whole all-in-one library just so you can call x endpoint,
 or you have to build on from source because they don't provide distributed versions.
 
 Superagent requires you to use component which in itself is opinionated.
@@ -28,6 +28,12 @@ Request exposes only one global function, wait for it..`request`.
 
 I find them unnecessary bloat. Look at Grunt's source. They have to parse out AMD ceremony during build.
 So no AMD, learn to use globals! They are not that evil.
+
+## API
+
+```js
+
+```
 
 ## Licence
 
