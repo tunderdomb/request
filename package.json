@@ -1,5 +1,5 @@
 {
-  "name": "request",
+  "name": "miniagent",
   "version": "2.0.0",
   "description": "Client side http requests.",
   "devDependencies": {

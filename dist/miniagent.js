@@ -722,6 +722,5 @@ methods.forEach(function( method ){
   }
 })
 
-module.exports = request
-
+module.exports = window.miniagent = request
 },{"./Radio":1}]},{},[2])

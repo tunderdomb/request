@@ -1,5 +1,8 @@
-Request.js
+miniagent.js
 ==========
+
+Previously request.js. Renamed because it clashed with the famous npm module.
+So now it's available on npm too.
 
 Simple http request on the client side.
 Inspired by [superagent](https://github.com/visionmedia/superagent).
@@ -9,26 +12,37 @@ Inspired by [superagent](https://github.com/visionmedia/superagent).
 I tell you why. There's no unopinionated library out there.
 Either you have to pull in a whole all-in-one library just so you can call x endpoint,
 or you have to build on from source because they don't provide distributed versions.
-
 Superagent requires you to use component which in itself is opinionated.
-
-Request requires you nothing.
+Request doesn't have a client side version. Well, it has a port..but it's not that elegant!
+So there you have it.
 
 ## Install
+
+    npm install request
+
+or
 
     bower install request
 
 ## Usage
 
+### With browserify
+
+    var request = require("miniagent")
+
+### With simple js
+
+    <script type="text/javascript" src="<path-to-miniagent>/dist/request.js"></script>
+
+or
+
+    <script type="text/javascript" src="<path-to-miniagent>/dist/request.min.js"></script>
+
+then
+
+    var request = window.miniagent
+
 Minified and dev build are available in the `dest/` dir.
-
-Request exposes only one global function, wait for it..`request`.
-It's also browserify enabled, so you can just `require("request")` in the browser.
-
-### Why no AMD?
-
-I find them unnecessary bloat. Look at Grunt's source. They have to parse out AMD ceremony during build.
-So no AMD, learn to use globals! They are not that evil.
 
 ## API
 
@@ -86,6 +100,8 @@ mime["urlencoded"] = mime["form"] = mime["url"] = "application/x-www-form-urlenc
 mime["form-data"] = mime["multipart"] = "multipart/form-data"
 
 ```
+
+For more details, check out the source.
 
 ## Licence
 

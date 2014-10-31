@@ -655,4 +655,4 @@ methods.forEach(function( method ){
   }
 })
 
-module.exports = window.request = request
+module.exports = window.miniagent = request
