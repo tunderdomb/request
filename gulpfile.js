@@ -1,0 +1,30 @@
+var browserify = require("gulp-browserify")
+var concat = require('gulp-concat')
+var plumber = require('gulp-plumber')
+var gulp = require('gulp')
+var uglify = require('gulp-uglifyjs')
+var template = require('gulp-template')
+
+gulp.task("browserify",  function(  ){
+  return gulp.src(["src/request.js"])
+    .pipe(plumber())
+    .pipe(browserify({}))
+    .pipe(concat("request.js"))
+    .pipe(gulp.dest("dist"))
+    .pipe(uglify("request.min.js"))
+    .pipe(gulp.dest("dist"))
+})
+gulp.task("banner", ["browserify"], function(  ){
+  gulp.src(["src/banner.js", "dist/request.js"])
+    .pipe(concat("request.js"))
+    .pipe(template({pkg: require("./package.json")}))
+    .pipe(gulp.dest("dist"))
+  gulp.src(["src/banner.js", "dist/request.min.js"])
+    .pipe(concat("request.min.js"))
+    .pipe(template({pkg: require("./package.json")}))
+    .pipe(gulp.dest("dist"))
+})
+
+gulp.task("default", ["banner"])
+
+//gulp.watch("src/**/*.js", ["browserify"])

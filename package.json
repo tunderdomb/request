@@ -1,26 +1,27 @@
 {
   "name": "request",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Client side http requests.",
   "devDependencies": {
-    "grunt-contrib-concat": "0.4.0",
-    "grunt": "0.4.5",
-    "grunt-contrib-uglify": "0.5.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "gulp": "~3.8.9",
+    "gulp-uglifyjs": "~0.4.4",
+    "gulp-plumber": "~0.6.6",
+    "gulp-concat": "~2.4.1",
+    "gulp-browserify": "~0.5.0",
+    "gulp-template": "~1.1.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/tunderdomb/request.git"
   },
+  "main": "./dist/request.min.js",
+  "browser": "./src/request.js",
   "keywords": [
     "http",
     "request",
     "ajax",
     "browser",
-    "client",
-    "side"
+    "client"
   ],
   "author": "Nagy Zoltan <tunderdomb@gmail.com> (tunderdomb)",
   "license": "MIT",
