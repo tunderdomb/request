@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/tunderdomb/request.git"
   },
-  "main": "./dist/request.min.js",
+  "main": "./dist/miniagent.min.js",
   "browser": "./src/request.js",
   "keywords": [
     "http",
