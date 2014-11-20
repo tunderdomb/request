@@ -1,6 +1,6 @@
 {
   "name": "miniagent",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Client side http requests.",
   "devDependencies": {
     "gulp": "~3.8.9",

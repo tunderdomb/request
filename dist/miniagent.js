@@ -1,9 +1,3 @@
-/*!
-* Request.js 2.0.0
-* Client side http requests.
-* MIT License
-* https://github.com/tunderdomb/request.git
-* */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = Radio
 
@@ -172,6 +166,7 @@ function RequestOptions( method, url ){
   this.form = null
   this.method = method
   this.url = url
+  this.href = url
 }
 
 RequestOptions.prototype.guessHeader = function(){
@@ -233,6 +228,8 @@ RequestOptions.prototype.prepare = function(){
       : "?" + query
   }
 
+  this.href = url
+
   // CORS
   if( this.withCredentials ) http.withCredentials = true
 
@@ -241,7 +238,7 @@ RequestOptions.prototype.prepare = function(){
     http.open(method, url, true, this.user, this.password)
   }
   else{
-    http.open(method, this.url, true)
+    http.open(method, url, true)
   }
 
   // set request headers
@@ -655,6 +652,7 @@ function parseValue( val ){
 }
 
 function Response( req ){
+  this.request = req
   var resp = this
   var http = req.http
   this.text = http.responseText

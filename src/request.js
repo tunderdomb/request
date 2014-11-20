@@ -105,6 +105,7 @@ function RequestOptions( method, url ){
   this.form = null
   this.method = method
   this.url = url
+  this.href = url
 }
 
 RequestOptions.prototype.guessHeader = function(){
@@ -166,6 +167,8 @@ RequestOptions.prototype.prepare = function(){
       : "?" + query
   }
 
+  this.href = url
+
   // CORS
   if( this.withCredentials ) http.withCredentials = true
 
@@ -174,7 +177,7 @@ RequestOptions.prototype.prepare = function(){
     http.open(method, url, true, this.user, this.password)
   }
   else{
-    http.open(method, this.url, true)
+    http.open(method, url, true)
   }
 
   // set request headers
@@ -588,6 +591,7 @@ function parseValue( val ){
 }
 
 function Response( req ){
+  this.request = req
   var resp = this
   var http = req.http
   this.text = http.responseText
